@@ -1,5 +1,5 @@
 {
-  "name": "emoji-mart-fictioneers",
+  "name": "@paulking86/emoji-mart-fictioneers",
   "version": "5.2.2",
   "description": "Emoji picker for the web",
   "license": "MIT",
@@ -54,6 +54,9 @@
     "LICENSE"
   ],
   "publishConfig": {
-    "registry":"https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com"
+  },
+  "dependencies": {
+    "@emoji-mart/data": "^1.0.6"
   }
 }
