@@ -9,6 +9,7 @@ import {
 
 export let I18n = null
 export let Data = null
+let originalData = null
 
 const fetchCache = {}
 async function fetchJSON(src) {
@@ -52,43 +53,36 @@ async function _init(props) {
   set || (set = PickerProps.set.value)
   locale || (locale = PickerProps.locale.value)
 
-  if (!Data) {
-    Data =
+  if (!originalData) {
+    originalData =
       (typeof props.data === 'function' ? await props.data() : props.data) ||
       (await fetchJSON(
         `https://cdn.jsdelivr.net/npm/@emoji-mart/data@latest/sets/${emojiVersion}/${set}.json`,
       ))
 
-    Data.emoticons = {}
-    Data.natives = {}
+    originalData.emoticons = {}
+    originalData.natives = {}
 
-    Data.categories.unshift({
+    originalData.categories.unshift({
       id: 'frequent',
       emojis: [],
     })
 
-    for (const alias in Data.aliases) {
-      const emojiId = Data.aliases[alias]
-      const emoji = Data.emojis[emojiId]
+    for (const alias in originalData.aliases) {
+      const emojiId = originalData.aliases[alias]
+      const emoji = originalData.emojis[emojiId]
       if (!emoji) continue
 
       emoji.aliases || (emoji.aliases = [])
       emoji.aliases.push(alias)
     }
-
-    Data.originalCategories = Data.categories
-  } else {
-    Data.categories = Data.categories.filter((c) => {
-      const isCustom = !!c.name
-      if (!isCustom) return true
-
-      return false
-    })
   }
+
+  Data = JSON.parse(JSON.stringify(originalData))
 
   I18n =
     (typeof props.i18n === 'function' ? await props.i18n() : props.i18n) ||
-    (locale == 'en'
+    (locale === 'en'
       ? i18n_en
       : await fetchJSON(
           `https://cdn.jsdelivr.net/npm/@emoji-mart/data@latest/i18n/${locale}.json`,
@@ -118,7 +112,7 @@ async function _init(props) {
   }
 
   if (props.categories) {
-    Data.categories = Data.originalCategories
+    Data.categories = Data.categories
       .filter((c) => {
         return props.categories.indexOf(c.id) != -1
       })
